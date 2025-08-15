@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">📊 Tổng quan chi tiêu</h3>
+  <div>
+    <a href="{{ url_for('add') }}" class="btn btn-primary">+ Thêm khoản chi</a>
+  </div>
+</div>
+
+{% if warning %}
+  <div class="alert alert-warning">{{ warning }}</div>
+{% endif %}
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form class="row g-2" method="get" action="{{ url_for('index') }}">
+      <div class="col-md-4">
+        <label class="form-label">Từ ngày</label>
+        <input type="date" name="from_date" value="{{ from_date }}" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Đến ngày</label>
+        <input type="date" name="to_date" value="{{ to_date }}" class="form-control">
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <button class="btn btn-outline-secondary me-2" type="submit">Lọc</button>
+        <a class="btn btn-outline-dark" href="{{ url_for('index') }}">Xoá lọc</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">Tổng (đang xem)</h5>
+          <span class="badge bg-primary">{{ "{:,.0f}".format(tong_tien) }} đ</span>
+        </div>
+        <div class="small text-muted">Ngân sách tháng {{ current_ym }}:
+          <strong>{{ "{:,.0f}".format(budget or 0) }} đ</strong>
+        </div>
+        <div class="small text-muted">Đã chi tháng này:
+          <strong>{{ "{:,.0f}".format(chi_thang_nay or 0) }} đ</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="mb-3">Tổng chi theo tháng</h5>
+        <canvas id="monthlyBar"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-body">
+    <h5 class="mb-3">Danh sách chi tiêu</h5>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>Ngày</th>
+            <th>Tên</th>
+            <th>Loại</th>
+            <th class="text-end">Số tiền</th>
+            <th>Mô tả</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in danh_sach %}
+            <tr>
+              <td>{{ item[5] }}</td>
+              <td>{{ item[1] }}</td>
+              <td>{{ item[4] }}</td>
+              <td class="text-end">{{ "{:,.0f}".format(item[2]) }}</td>
+              <td class="text-muted">{{ item[3] }}</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Xoá khoản chi này?');"
+                   href="{{ url_for('delete', id=item[0]) }}">Xoá</a>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="text-center text-muted">Chưa có dữ liệu.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const labels = {{ thong_ke_thang | map(attribute=0) | list | tojson }};
+  const values = {{ thong_ke_thang | map(attribute=1) | list | tojson }};
+
+  console.log("📊 Chart labels:", labels);
+  console.log("📊 Chart values:", values);
+
+  if (labels.length && document.getElementById('monthlyBar')) {
+    new Chart(document.getElementById('monthlyBar').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Tổng chi (đ)',
+          data: values,
+          backgroundColor: '#4e73df'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return value.toLocaleString('vi-VN') + ' đ';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
