@@ -43,7 +43,7 @@
 
 ### 1. Clone project
 ```bash
-git clone https://github.com/<username>/quan-ly-chi-tieu.git
+git clone https://github.com/ngoctrinh041205/quan-ly-chi-tieu.git
 cd quan-ly-chi-tieu
 ```
 
