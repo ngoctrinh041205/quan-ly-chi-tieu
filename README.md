@@ -45,6 +45,7 @@
 ```bash
 git clone https://github.com/<username>/quan-ly-chi-tieu.git
 cd quan-ly-chi-tieu
+```
 
 ### 2. 📚 Thư viện Python sử dụng
 
@@ -59,7 +60,9 @@ cd quan-ly-chi-tieu
 - secrets — Tạo khóa bí mật (secret key).
 
 ### 3. Chạy ứng dụng
+```bash
 python app.py
+```
 
 Ứng dụng chạy tại: http://127.0.0.1:5000
 
@@ -76,4 +79,5 @@ Lần chạy đầu, app sẽ tự tạo database chi_tieu.db và chuẩn hoá c
 
 ### Biểu đồ thống kê
 ![Charts](screenshots/charts.png)
+---
 
